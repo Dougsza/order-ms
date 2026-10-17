@@ -62,6 +62,31 @@ O valor total do pedido é calculado a partir da quantidade e do preço de cada 
 
 ## API
 
+`POST /orders` recebe um pedido e publica o evento na fila `btg-pactual-order-created` para processamento assíncrono.
+
+Exemplo de requisição:
+
+```http
+POST http://localhost:8080/orders
+Content-Type: application/json
+```
+
+```json
+{
+  "orderCode": 1,
+  "clientCode": 42,
+  "items": [
+    {
+      "product": "Produto",
+      "quantity": 2,
+      "price": 19.90
+    }
+  ]
+}
+```
+
+Quando o pedido é aceito para publicação, a API responde com `202 Accepted`. Essa resposta confirma o recebimento para processamento, mas não garante que o pedido já foi salvo no MongoDB.
+
 `GET /customers/{customerId}/orders` lista os pedidos do cliente e o total acumulado. Os parâmetros opcionais `page` (padrão `0`) e `pageSize` (padrão `10`) controlam a paginação.
 
 Exemplo:
@@ -80,4 +105,4 @@ Execute os testes unitários e de contexto com:
 .\mvnw.cmd test
 ```
 
-Os testes unitários do serviço usam JUnit 5 e Mockito e não precisam de conexões reais com MongoDB ou RabbitMQ.
+Os testes unitários do serviço, do publicador e do controller usam JUnit 5 e Mockito e não precisam de conexões reais com MongoDB ou RabbitMQ.
