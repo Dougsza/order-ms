@@ -22,7 +22,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final MongoTemplate mongoTemplate
+    private final MongoTemplate mongoTemplate;
     public OrderService(OrderRepository orderRepository,
                         MongoTemplate mongoTemplate) {
 

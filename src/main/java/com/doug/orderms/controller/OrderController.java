@@ -3,13 +3,12 @@ package com.doug.orderms.controller;
 import com.doug.orderms.controller.dto.ApiResponse;
 import com.doug.orderms.controller.dto.OrderResponse;
 import com.doug.orderms.controller.dto.PaginationResponse;
+import com.doug.orderms.listener.dto.OrderCreatedEvent;
+import com.doug.orderms.services.OrderPublisher;
 import com.doug.orderms.services.OrderService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -17,9 +16,17 @@ import java.util.Map;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderPublisher orderPublisher;
 
-    public OrderController(OrderService orderService){
+    public OrderController(OrderService orderService, OrderPublisher orderPublisher){
         this.orderService = orderService;
+        this.orderPublisher = orderPublisher;
+    }
+
+    @PostMapping("/orders")
+    public ResponseEntity<Void> createOrder(@RequestBody OrderCreatedEvent event){
+        orderPublisher.publish(event);
+        return ResponseEntity.accepted().build();
     }
 
     @GetMapping("/customers/{customerId}/orders")
