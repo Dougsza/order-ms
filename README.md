@@ -91,7 +91,7 @@ Quando o pedido é aceito para publicação, a API responde com `202 Accepted`. 
 
 Exemplo:
 
-```text
+```http
 GET http://localhost:8080/customers/42/orders?page=0&pageSize=10
 ```
 
