@@ -97,6 +97,13 @@ GET http://localhost:8080/customers/42/orders?page=0&pageSize=10
 
 A resposta contém o resumo com `totalOnOrders`, os pedidos da página em `data` e os metadados de paginação em `pagination`.
 
+## Documentação da API
+
+Com a aplicação em execução, acesse o Swagger UI para explorar e testar os endpoints:
+
+- Swagger UI: http://localhost:8080/swagger-ui/index.html
+- Especificação OpenAPI em JSON: http://localhost:8080/v3/api-docs
+
 ## Testes
 
 Execute os testes unitários e de contexto com:
