@@ -5,12 +5,14 @@ import com.doug.orderms.controller.dto.OrderResponse;
 import com.doug.orderms.controller.dto.PaginationResponse;
 import com.doug.orderms.controller.dto.OrderSummaryResponse;
 import com.doug.orderms.listener.dto.OrderCreatedEvent;
+import com.doug.orderms.controller.dto.ApiErrorResponse;
 import com.doug.orderms.services.OrderPublisher;
 import com.doug.orderms.services.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +39,13 @@ public class OrderController {
     @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "202",
             description = "Pedido aceito para processamento."
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "O pedido contém dados inválidos.",
+            content = @Content(
+                    schema = @Schema(implementation = ApiErrorResponse.class)
+            )
     )
     @PostMapping("/orders")
     public ResponseEntity<Void> createOrder(@io.swagger.v3.oas.annotations.parameters.RequestBody(
