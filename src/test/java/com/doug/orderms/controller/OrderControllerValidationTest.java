@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(OrderController.class)
 @Import(GlobalExceptionHandler.class)
@@ -89,5 +90,19 @@ class OrderControllerValidationTest {
                 ))
         ));
 
+    }
+
+    @Test
+    void listOrdersWithInvalidPageSizeReturnsBadRequest() throws Exception {
+        mockMvc.perform(get("/customers/42/orders")
+                        .param("page", "0")
+                        .param("pageSize", "0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.details[0].field").value("pageSize"))
+                .andExpect(jsonPath("$.details[0].message")
+                        .value("pageSize deve ser pelo menos 1"));
+
+        verifyNoInteractions(orderService);
     }
 }

@@ -18,6 +18,8 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 
 @Tag(name = "Pedidos", description = "Operações para recebimento e consulta de pedidos.")
 @RestController
@@ -73,9 +75,12 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> listOrders(@Parameter(description = "Identificador do cliente.", example = "42")
                                                                  @PathVariable("customerId") Long customerId,
 
+                                                                 @Min(value = 0, message = "page deve ser maior ou igual a zero")
                                                                  @Parameter(description = "Número da página, começando em 0.", example = "0")
                                                                  @RequestParam(name = "page", defaultValue = "0") Integer page,
 
+                                                                 @Min(value = 1, message = "pageSize deve ser pelo menos 1")
+                                                                 @Max(value = 50, message = "pageSize não pode ser maior que 50")
                                                                  @Parameter(description = "Quantidade máxima de pedidos por página.", example = "10")
                                                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
 
