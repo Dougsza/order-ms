@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,14 +39,13 @@ public class OrderController {
             description = "Pedido aceito para processamento."
     )
     @PostMapping("/orders")
-    public ResponseEntity<Void> createOrder(
-                                            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+    public ResponseEntity<Void> createOrder(@io.swagger.v3.oas.annotations.parameters.RequestBody(
                                                     description = "Pedido a ser aceito para processamento assíncrono.",
                                                     content = @Content(examples = @ExampleObject(
                                                             value = "{\"orderCode\": 123, \"clientCode\": 42, \"items\": [{\"product\": \"Teclado\", \"quantity\": 2, \"price\": 49.90}]}"
                                                     ))
                                             )
-                                            @RequestBody OrderCreatedEvent event
+                                            @Valid @RequestBody OrderCreatedEvent event
     ){
         orderPublisher.publish(event);
         return ResponseEntity.accepted().build();
