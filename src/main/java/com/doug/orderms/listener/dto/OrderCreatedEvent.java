@@ -19,9 +19,8 @@ public record OrderCreatedEvent (
         @Schema(description = "Identificador do cliente.", example = "42")
         Long clientCode,
 
-        @Valid
         @NotEmpty(message = "items não pode ser vazio")
         @Schema(description = "Lista de items do pedido")
-        List<OrderItemEvent> items
+        List<@Valid OrderItemEvent> items
 ) {
 }
