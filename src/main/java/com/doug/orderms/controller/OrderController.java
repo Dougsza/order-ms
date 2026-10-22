@@ -5,16 +5,21 @@ import com.doug.orderms.controller.dto.OrderResponse;
 import com.doug.orderms.controller.dto.PaginationResponse;
 import com.doug.orderms.controller.dto.OrderSummaryResponse;
 import com.doug.orderms.listener.dto.OrderCreatedEvent;
+import com.doug.orderms.controller.dto.ApiErrorResponse;
 import com.doug.orderms.services.OrderPublisher;
 import com.doug.orderms.services.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 
 @Tag(name = "Pedidos", description = "Operações para recebimento e consulta de pedidos.")
 @RestController
@@ -37,15 +42,21 @@ public class OrderController {
             responseCode = "202",
             description = "Pedido aceito para processamento."
     )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "O pedido contém dados inválidos.",
+            content = @Content(
+                    schema = @Schema(implementation = ApiErrorResponse.class)
+            )
+    )
     @PostMapping("/orders")
-    public ResponseEntity<Void> createOrder(
-                                            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+    public ResponseEntity<Void> createOrder(@io.swagger.v3.oas.annotations.parameters.RequestBody(
                                                     description = "Pedido a ser aceito para processamento assíncrono.",
                                                     content = @Content(examples = @ExampleObject(
                                                             value = "{\"orderCode\": 123, \"clientCode\": 42, \"items\": [{\"product\": \"Teclado\", \"quantity\": 2, \"price\": 49.90}]}"
                                                     ))
                                             )
-                                            @RequestBody OrderCreatedEvent event
+                                            @Valid @RequestBody OrderCreatedEvent event
     ){
         orderPublisher.publish(event);
         return ResponseEntity.accepted().build();
@@ -64,9 +75,12 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> listOrders(@Parameter(description = "Identificador do cliente.", example = "42")
                                                                  @PathVariable("customerId") Long customerId,
 
+                                                                 @Min(value = 0, message = "page deve ser maior ou igual a zero")
                                                                  @Parameter(description = "Número da página, começando em 0.", example = "0")
                                                                  @RequestParam(name = "page", defaultValue = "0") Integer page,
 
+                                                                 @Min(value = 1, message = "pageSize deve ser pelo menos 1")
+                                                                 @Max(value = 50, message = "pageSize não pode ser maior que 50")
                                                                  @Parameter(description = "Quantidade máxima de pedidos por página.", example = "10")
                                                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
 
