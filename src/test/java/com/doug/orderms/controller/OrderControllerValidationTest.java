@@ -62,7 +62,7 @@ class OrderControllerValidationTest {
     }
 
     @Test
-    void createOrderWithAValidRequest_thenShouldReturnAcceptedAndPublishedEvent() throws Exception{
+    void createOrderWithAValidRequestThenShouldReturnAcceptedAndPublishedEvent() throws Exception{
         mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
