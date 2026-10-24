@@ -10,17 +10,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.bson.Document;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -81,7 +84,7 @@ class OrderServiceTest {
         order.setOrderId(123L);
         order.setCustomerId(customerId);
         order.setTotal(new BigDecimal("125.30"));
-        when(orderRepository.findAllByCustomerId(customerId, pageRequest))
+        Mockito.when(orderRepository.findAllByCustomerId(customerId, pageRequest))
                 .thenReturn(new PageImpl<>(List.of(order), pageRequest, 6));
 
         var result = orderService.findAllByCustomerId(customerId, pageRequest);
@@ -94,5 +97,18 @@ class OrderServiceTest {
         assertEquals(1, result.getNumber());
         assertEquals(2, result.getTotalPages());
         verify(orderRepository).findAllByCustomerId(customerId, pageRequest);
+    }
+
+    @Test
+    void findTotalOnOrdersByCustomerIdThenReturnsZeroWhenNoOrdersExists(){
+        Mockito.when(mongoTemplate.aggregate(
+                Mockito.any(Aggregation.class),
+                Mockito.eq("tb_orders"),
+                Mockito.eq(Document.class)
+        )).thenReturn(new AggregationResults<>(List.of(), new Document()));
+
+        var result = orderService.findTotalOnOrdersByCustomerId(456L);
+
+        assertEquals(BigDecimal.ZERO, result);
     }
 }
