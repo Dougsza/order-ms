@@ -97,6 +97,12 @@ GET http://localhost:8080/customers/42/orders?page=0&pageSize=10
 
 A resposta contém o resumo com `totalOnOrders`, os pedidos da página em `data` e os metadados de paginação em `pagination`.
 
+## Falhas no processamento
+
+Se ocorrer uma exceção ao processar um pedido, o listener tenta processá-lo até três vezes no total: a tentativa inicial e mais duas repetições. O intervalo começa em 1 segundo e dobra a cada repetição.
+
+Se todas as tentativas falharem, o RabbitMQ encaminha a mensagem para a fila `btg-pactual-order-created.dlq`, por meio do exchange `orders.dlx`. Essa fila pode ser consultada para investigar mensagens que não foram processadas. O projeto não reprocessa automaticamente as mensagens da DLQ.
+
 ## Documentação da API
 
 Com a aplicação em execução, acesse o Swagger UI para explorar e testar os endpoints:
@@ -113,3 +119,11 @@ Execute os testes unitários e de contexto com:
 ```
 
 Os testes unitários do serviço, do publicador e do controller usam JUnit 5 e Mockito e não precisam de conexões reais com MongoDB ou RabbitMQ.
+
+O teste de integração do processamento de pedidos usa Testcontainers para iniciar MongoDB e RabbitMQ em containers Docker. Para executá-lo, deixe o Docker em execução e rode:
+
+```powershell
+.\mvnw.cmd -Dtest=OrderProcessingIntegrationTest test
+```
+
+Esse teste verifica o fluxo completo: publicação do pedido no RabbitMQ, consumo pelo listener e persistência no MongoDB.

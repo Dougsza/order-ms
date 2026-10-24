@@ -49,13 +49,17 @@ public class OrderService {
 
     public BigDecimal findTotalOnOrdersByCustomerId(Long customerId){
         var aggregations = newAggregation(
-          match(Criteria.where("customerId").is(customerId)),
-          group().sum("total").as("total")
+                match(Criteria.where("customerId").is(customerId)),
+                group().sum("total").as("total")
         );
 
         var response = mongoTemplate.aggregate(aggregations, "tb_orders", Document.class);
+        var result = response.getUniqueMappedResult();
 
-        return new BigDecimal(response.getUniqueMappedResult().get("total").toString());
+        if (result == null || result.get("total") == null) {
+            return BigDecimal.ZERO;
+        }
+        return new BigDecimal(result.get("total").toString());
     }
 
     private BigDecimal getTotal(OrderCreatedEvent event) {
