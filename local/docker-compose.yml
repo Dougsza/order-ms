@@ -4,11 +4,14 @@ services:
     ports:
       - 27017:27017
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=123
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:?Defina MONGODB_PASSWORD em local/.env}
 
   rabbitmq:
     image: rabbitmq:3.13-management
     ports:
       - 15672:15672
       - 5672:5672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:-orderms}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Defina RABBITMQ_PASSWORD em local/.env}
